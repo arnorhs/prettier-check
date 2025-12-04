@@ -1,0 +1,12 @@
+name: Run prettier
+description: Run prettier on your codebase with any prettier plugin
+
+inputs:
+  plugins:
+    description: Prettier plugins to use
+    required: false
+    default: ''
+
+runs:
+  using: node20
+  main: dist/index.mjs
