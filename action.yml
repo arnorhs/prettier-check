@@ -1,11 +1,7 @@
 name: Run prettier
-description: Run prettier on your codebase with any prettier plugin
-
-inputs:
-  plugins:
-    description: Prettier plugins to use
-    required: false
-    default: ''
+description: |
+  Run your version of prettier on your codebase with any prettier plugin, without
+  installing every dependency in the repo.
 
 runs:
   using: node20
