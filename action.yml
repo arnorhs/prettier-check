@@ -3,6 +3,12 @@ description: |
   Run your version of prettier on your codebase with any prettier plugin, without
   installing every dependency in the repo.
 
+author: Arnor Heidar Sigurdsson <arnorhs@gmail.com>
+
 runs:
   using: node20
   main: dist/index.mjs
+
+branding:
+  icon: 'award'
+  color: 'green'

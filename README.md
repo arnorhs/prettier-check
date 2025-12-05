@@ -1,8 +1,8 @@
-# Setup and run prettier with any plugin
+# Setup and run prettier --check with any plugin
 
-**Setup Prettier** is a github action that provides a cross-platform environment to
-setup and run prettier --check on your code, using your defined prettier version and dependencies
-without custom hacks.
+**Setup Prettier** is a github action that provides a way to
+setup and run `prettier --check` on your code, using your defined prettier version
+and dependencies without custom hacks.
 
 ## Why?
 
@@ -23,9 +23,33 @@ light-weight fashion.
 To use this action in your github workflows:
 
 ```yml
+name: CI
+on: push
 
+jobs:
+  check_formatting:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Run prettier action
+        uses: arnorhs/setup-prettier@v1.0.2
 ```
 
-## Limitations
+## Limitations and opinions
 
 This action only supports checking prettier for formatting, not running it and committing.
+
+It does not have any configuration / inputs yet.
+
+As of now, this action is _pretty_ opinionated. It presumes and requires the following:
+
+- Only checks changed files compared to the base branch (`GITHUB_BASE_REF`)
+- Assumes your repo has a root `package.json`
+- Assumes you have your prettier plugins in the root `package.json`
+
+## TODO:
+
+Join paths using

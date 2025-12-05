@@ -2,29 +2,23 @@ import * as cache from '@actions/cache'
 import * as core from '@actions/core'
 import fs from 'node:fs/promises'
 import { calculateHash } from './lib/calculateHash'
+import { createLogTrace } from './lib/createLogTrace'
 import { exec } from './lib/exec'
+import { getFilesToCheck } from './lib/getFilesToCheck'
 import { npmInstallWithTmpJson } from './lib/npmInstallWithTmpJson'
-import { readPackageJson } from './lib/readPackageJson'
+import { readJsonFile } from './lib/readJsonFile'
 
 const CACHE_KEY = 'prettier-action-cache-v1'
 
-let last = Date.now()
-
-function logTrace(message: string) {
-  const elapsed = ((Date.now() - last) / 1000).toFixed(2)
-  core.debug(`[${elapsed}s] trace: ${message}`)
-  last = Date.now()
-}
+const logTrace = createLogTrace(core)
 
 let pkgJson
 try {
-  pkgJson = await readPackageJson('./package.json')
+  pkgJson = await readJsonFile('./package.json')
 } catch (e: any) {
   core.setFailed(e.message)
   process.exit(1)
 }
-
-logTrace('read package.json')
 
 const deps = Object.fromEntries(
   Object.entries({
@@ -37,7 +31,7 @@ const deps = Object.fromEntries(
 const depsHash = calculateHash(JSON.stringify(deps))
 const hashKey = `${CACHE_KEY}-${depsHash}`
 
-logTrace('hash calculated')
+logTrace(`ready to restore from cache ${hashKey}`)
 
 const usedKey = await cache.restoreCache(['./node_modules'], hashKey, [
   `${CACHE_KEY}-`,
@@ -70,10 +64,12 @@ if (usedKey !== hashKey) {
 }
 
 try {
+  const changedFiles = await getFilesToCheck(process.env.GITHUB_BASE_REF)
+  logTrace(`changed files:\n${changedFiles}`)
   const { stdout, stderr } = await exec(
-    `./node_modules/.bin/prettier --check $(git diff --name-only ${process.env.GITHUB_BASE_REF || 'main'})`,
+    `./node_modules/.bin/prettier --check ${changedFiles}`,
   )
-  logTrace(`${stdout}\n${stderr}`)
+  logTrace(`prettier ran\nstdout:\n${stdout}\nstderr:\n${stderr}`)
 } catch (e) {
   core.setFailed('Prettier check failed. See output for details.')
   process.exit(1)
