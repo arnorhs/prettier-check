@@ -62475,8 +62475,10 @@ if (usedKey !== hashKey) {
 try {
   const baseRef = process.env.GITHUB_BASE_REF;
   const changedFiles = baseRef ? await getFilesToCheck(`origin/${baseRef}`) : ".";
-  core.info(`changed files since ${process.env.GITHUB_BASE_REF}: 
+  if (changedFiles !== ".") {
+    core.info(`changed files since ${process.env.GITHUB_BASE_REF}: 
 ${changedFiles}`);
+  }
   await exec(`./node_modules/.bin/prettier --check ${changedFiles.split(`
 `).join(" ")}`);
   logTrace(`prettier ran`);
