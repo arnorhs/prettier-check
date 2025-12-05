@@ -69,9 +69,11 @@ try {
     ? await getFilesToCheck(`origin/${baseRef}`)
     : '.'
 
-  core.info(
-    `changed files since ${process.env.GITHUB_BASE_REF}: \n${changedFiles}`,
-  )
+  if (changedFiles !== '.') {
+    core.info(
+      `changed files since ${process.env.GITHUB_BASE_REF}: \n${changedFiles}`,
+    )
+  }
 
   await exec(
     `./node_modules/.bin/prettier --check ${changedFiles.split('\n').join(' ')}`,
