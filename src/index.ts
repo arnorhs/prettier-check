@@ -73,8 +73,8 @@ try {
   await exec(`./node_modules/.bin/prettier --check ${changedFiles}`)
 
   logTrace(`prettier ran`)
-} catch (e) {
-  core.setFailed('Prettier check failed. See output for details.')
+} catch (e: any) {
+  core.setFailed('Prettier check failed.\n' + e.message)
   process.exit(1)
 }
 

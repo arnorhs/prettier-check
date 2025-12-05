@@ -1,11 +1,10 @@
 name: Test the action
 on:
   - pull_request
-  - push
 
 jobs:
   prettier_test:
-    name: Test the plugin
+    name: Prettier job
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
