@@ -66390,8 +66390,7 @@ if (usedKey !== hashKey) {
   logTrace("cache saved");
 }
 try {
-  core.info(JSON.stringify(github.context, null, 2));
-  const baseRef = github.context.payload?.pull_request?.base?.repo?.sha;
+  const baseRef = github.context.payload?.pull_request?.base?.sha;
   const changedFiles = baseRef ? await getFilesToCheck(baseRef) : ".";
   if (changedFiles !== ".") {
     core.info(`changed files since ${baseRef}: 
