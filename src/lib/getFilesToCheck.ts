@@ -5,9 +5,7 @@ export async function getFilesToCheck(ref: string | undefined) {
     return '.'
   }
 
-  const { stdout } = await exec(
-    `git diff --name-only ${process.env.GITHUB_BASE_REF || 'HEAD~1'}`,
-  )
+  const { stdout } = await exec(`git diff --name-only ${ref}`)
 
   return stdout.trim()
 }

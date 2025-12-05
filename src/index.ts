@@ -65,7 +65,10 @@ if (usedKey !== hashKey) {
 
 try {
   const changedFiles = await getFilesToCheck(process.env.GITHUB_BASE_REF)
-  logTrace(`changed files:\n${changedFiles}`)
+
+  logTrace(
+    `changed files since ${process.env.GITHUB_BASE_REF}: \n${changedFiles}`,
+  )
   const { stdout, stderr } = await exec(
     `./node_modules/.bin/prettier --check ${changedFiles}`,
   )
