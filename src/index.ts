@@ -69,6 +69,8 @@ try {
   if (!baseRef) {
     const mainBranch = core.getInput('main-branch').trim() || 'main'
 
+    core.info(`missing base ref, will use main branch: ${mainBranch}`)
+
     const newBaseRef = await exec(
       `git merge-base remotes/origin/${mainBranch} HEAD`,
     )
@@ -81,9 +83,7 @@ try {
 
   const changedFiles = baseRef ? await getFilesToCheck(baseRef) : '.'
 
-  if (changedFiles !== '.') {
-    core.info(`changed files since ${baseRef}: \n${changedFiles}`)
-  }
+  core.info(`baseRef: ${baseRef} - Files to check:\n${changedFiles}`)
 
   await exec(
     `./node_modules/.bin/prettier --check ${changedFiles.split('\n').join(' ')}`,
