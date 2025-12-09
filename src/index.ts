@@ -71,14 +71,22 @@ try {
 
     core.info(`missing base ref, will use main branch: ${mainBranch}`)
 
-    const newBaseRef = await exec(
-      `git merge-base remotes/origin/${mainBranch} HEAD`,
-    )
+    try {
+      const newBaseRef = await exec(
+        `git merge-base remotes/origin/${mainBranch} HEAD`,
+      )
 
-    baseRef = newBaseRef.stdout.trim()
-    core.info(
-      `no base ref, falling back to \`main-branch\` input (${mainBranch}) - new base ref: ${baseRef}`,
-    )
+      baseRef = newBaseRef.stdout.trim()
+    } catch (e: any) {
+      if (e.message.includes('Not a valid object name')) {
+        core.warning(
+          `main branch \`${mainBranch}\` does not exist in the remote. Falling back to checking all files.`,
+        )
+        baseRef = ''
+      } else {
+        throw e
+      }
+    }
   }
 
   const changedFiles = baseRef ? await getFilesToCheck(baseRef) : '.'
