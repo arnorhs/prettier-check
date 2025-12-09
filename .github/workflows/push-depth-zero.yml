@@ -1,0 +1,17 @@
+name: Test the action on push, fetch-depth 0
+on:
+  - push
+
+jobs:
+  prettier_test:
+    name: Prettier job
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Testing the action
+        uses: ./
+        with:
+          main-branch: master

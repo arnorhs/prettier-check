@@ -2,7 +2,7 @@
 
 **Prettier Check** is a github action that provides a way to
 setup and run `prettier --check` on your code, using your defined prettier version
-and dependencies without custom hacks.
+and prettier plugins without custom hacks.
 
 ## Why?
 
@@ -18,11 +18,14 @@ and hassle.
 So this is an attempt at basically setting up only prettier and the related plugins in a relatively
 light-weight fashion.
 
-## Usage
+## Usage examples
 
 To use this action in your github workflows:
 
 ### 1. Simple usage
+
+On event `push` it will attempt to use the main branch as the reference for changed files. So
+if your main branch is a different name, you need to set it with the `main-branch` option.
 
 ```yml
 name: CI
@@ -34,6 +37,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - name: Run prettier action
         uses: arnorhs/prettier-check@v1.0.3
 ```
