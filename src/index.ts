@@ -91,7 +91,7 @@ try {
 
   const changedFiles = baseRef ? await getFilesToCheck(baseRef) : '.'
 
-  core.info(`baseRef: ${baseRef} - Files to check:\n${changedFiles}`)
+  core.info(`baseRef: ${baseRef || '?'}\nFiles to check:\n${changedFiles}`)
 
   await exec(
     `./node_modules/.bin/prettier --check ${changedFiles.split('\n').join(' ')}`,
