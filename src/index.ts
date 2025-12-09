@@ -65,7 +65,20 @@ if (usedKey !== hashKey) {
 }
 
 try {
-  const baseRef = github.context.payload?.pull_request?.base?.sha
+  let baseRef = github.context.payload?.pull_request?.base?.sha
+  if (!baseRef) {
+    const mainBranch = core.getInput('main-branch').trim() || 'main'
+
+    const newBaseRef = await exec(
+      `git merge-base remotes/origin/${mainBranch} HEAD`,
+    )
+
+    baseRef = newBaseRef.stdout.trim()
+    core.info(
+      `no base ref, falling back to \`main-branch\` input (${mainBranch}) - new base ref: ${baseRef}`,
+    )
+  }
+
   const changedFiles = baseRef ? await getFilesToCheck(baseRef) : '.'
 
   if (changedFiles !== '.') {

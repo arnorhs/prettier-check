@@ -78,3 +78,5 @@ As of now, this action is _pretty_ opinionated:
 ## TODO:
 
 Make it work on other platforms
+
+look at https://github.com/marketplace/actions/changed-files

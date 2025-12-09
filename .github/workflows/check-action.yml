@@ -1,6 +1,7 @@
 name: Test the action
 on:
   - pull_request
+  - push
 
 jobs:
   prettier_test:
