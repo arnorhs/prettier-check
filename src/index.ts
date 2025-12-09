@@ -87,11 +87,13 @@ try {
         throw e
       }
     }
+  } else {
+    core.info(`found base ref from pull request: ${baseRef}`)
   }
 
   const changedFiles = baseRef ? await getFilesToCheck(baseRef) : '.'
 
-  core.info(`baseRef: ${baseRef || '?'}\nFiles to check:\n${changedFiles}`)
+  core.info(`Files to check:\n${changedFiles}`)
 
   await exec(
     `./node_modules/.bin/prettier --check ${changedFiles.split('\n').join(' ')}`,

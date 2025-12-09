@@ -66405,10 +66405,11 @@ try {
         throw e;
       }
     }
+  } else {
+    core.info(`found base ref from pull request: ${baseRef}`);
   }
   const changedFiles = baseRef ? await getFilesToCheck(baseRef) : ".";
-  core.info(`baseRef: ${baseRef || "?"}
-Files to check:
+  core.info(`Files to check:
 ${changedFiles}`);
   await exec(`./node_modules/.bin/prettier --check ${changedFiles.split(`
 `).join(" ")}`);
