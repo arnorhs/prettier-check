@@ -16,7 +16,7 @@ basically install everything, and re-use any caches etc and it just requires a b
 and hassle.
 
 So this is an attempt at basically setting up only prettier and the related plugins in a relatively
-light-weight fashion.
+light-weight fashion and running it only against changed files in the current PR or commit.
 
 ## Usage examples
 
@@ -40,10 +40,14 @@ jobs:
         with:
           fetch-depth: 0
       - name: Run prettier action
-        uses: arnorhs/prettier-check@v1.0.3
+        uses: arnorhs/prettier-check@v1.0.6
+        with:
+          main-branch: main
 ```
 
 ### 2. Only changed files in a pull request
+
+In this case, we already have the comparison sha, so you don't have to specify your `main-branch`.
 
 ```yml
 name: CI
@@ -56,17 +60,18 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          # without this, the git history will not have the main branch
           fetch-depth: 0
       - name: Run prettier action
-        uses: arnorhs/prettier-check@v1.0.3
+        uses: arnorhs/prettier-check@v1.0.6
 ```
+
+## Options
+
+- `main-branch`: This is the main reference branch that gets used to only check the formatting of changed files.
 
 ## Limitations and opinions
 
 This action only supports checking prettier for formatting, not running it and committing.
-
-It does not have any configuration / inputs yet.
 
 As of now, this action is _pretty_ opinionated:
 
@@ -75,7 +80,8 @@ As of now, this action is _pretty_ opinionated:
   after running, so if you've already done an `npm install`, you shouldn't really be using
   this action anyways.
 - If run in a `pull_request` action, it only checks changed files compared to the base
-  branch (`GITHUB_BASE_REF`)
+  branch (`GITHUB_BASE_REF`), but if its run in another context, it will check all files that have
+  changed compared to the `main-branch`
 - Assumes your repo has a root `package.json`
 - Assumes you have your prettier plugins in the root `package.json`
 - Doesn't have any options, and doesn't allow you to customize the prettier invocation.
@@ -83,5 +89,3 @@ As of now, this action is _pretty_ opinionated:
 ## TODO:
 
 Make it work on other platforms
-
-look at https://github.com/marketplace/actions/changed-files
