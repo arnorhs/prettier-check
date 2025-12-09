@@ -66399,7 +66399,7 @@ try {
       baseRef = newBaseRef.stdout.trim();
     } catch (e) {
       if (e.message.includes("Not a valid object name")) {
-        core.warning(`main branch \`${mainBranch}\` does not exist in the remote. Falling back to checking all files.`);
+        core.warning(`main branch \`${mainBranch}\` does not exist in the remote. You are most-likely missing ` + `the \`fetch-depth\` option in actions/checkout - Falling back to checking all files.`);
         baseRef = "";
       } else {
         throw e;
