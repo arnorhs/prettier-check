@@ -14,3 +14,5 @@ jobs:
           fetch-depth: 0
       - name: Testing the action
         uses: ./
+        with:
+          main-branch: master
