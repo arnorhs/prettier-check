@@ -66390,24 +66390,28 @@ if (usedKey !== hashKey) {
   logTrace("cache saved");
 }
 try {
-  const baseRef = github.context.payload?.pull_request?.base?.sha;
-  const changedFiles = baseRef ? await getFilesToCheck(baseRef) : ".";
-  if (changedFiles !== ".") {
-    core.info(`changed files since ${baseRef}: 
-${changedFiles}`);
+  let baseRef = github.context.payload?.pull_request?.base?.sha;
+  if (!baseRef) {
+    const mainBranch = core.getInput("main-branch").trim() || "main";
+    core.info(`missing base ref, will use main branch: ${mainBranch}`);
+    const newBaseRef = await exec(`git merge-base remotes/origin/${mainBranch} HEAD`);
+    baseRef = newBaseRef.stdout.trim();
+    core.info(`no base ref, falling back to \`main-branch\` input (${mainBranch}) - new base ref: ${baseRef}`);
   }
+  const changedFiles = baseRef ? await getFilesToCheck(baseRef) : ".";
+  core.info(`baseRef: ${baseRef} - Files to check:
+${changedFiles}`);
   await exec(`./node_modules/.bin/prettier --check ${changedFiles.split(`
 `).join(" ")}`);
-  logTrace(`prettier ran`);
+  core.info("Prettier check completed successfully.");
+  try {
+    await fs3.rm("./node_modules", { recursive: true });
+    logTrace("cleaned up node_modules");
+  } catch (e) {
+    core.warning(`Failed to clean up node_modules: ${e.message}`);
+  }
 } catch (e) {
   core.setFailed(`Prettier check failed.
 ` + e.message);
   process.exit(1);
 }
-try {
-  await fs3.rm("./node_modules", { recursive: true });
-  logTrace("cleaned up node_modules");
-} catch (e) {
-  core.warning(`Failed to clean up node_modules: ${e.message}`);
-}
-core.info("Prettier check completed successfully.");
