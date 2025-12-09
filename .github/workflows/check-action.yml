@@ -1,6 +1,6 @@
-name: Test the action
+name: Test the action on push, fetch-depth 0
 on:
-  - pull_request
+  - push
 
 jobs:
   prettier_test:
@@ -13,3 +13,5 @@ jobs:
           fetch-depth: 0
       - name: Testing the action
         uses: ./
+        with:
+          main-branch: master

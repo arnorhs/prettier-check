@@ -1,5 +1,6 @@
 import * as cache from '@actions/cache'
 import * as core from '@actions/core'
+import * as github from '@actions/github'
 import fs from 'node:fs/promises'
 import { calculateHash } from './lib/calculateHash'
 import { createLogTrace } from './lib/createLogTrace'
@@ -64,32 +65,50 @@ if (usedKey !== hashKey) {
 }
 
 try {
-  const baseRef = process.env.GITHUB_BASE_REF
-  const changedFiles = baseRef
-    ? await getFilesToCheck(`origin/${baseRef}`)
-    : '.'
+  let baseRef = github.context.payload?.pull_request?.base?.sha
+  if (!baseRef) {
+    const mainBranch = core.getInput('main-branch').trim() || 'main'
 
-  if (changedFiles !== '.') {
-    core.info(
-      `changed files since ${process.env.GITHUB_BASE_REF}: \n${changedFiles}`,
-    )
+    core.info(`missing base ref, will use main branch: ${mainBranch}`)
+
+    try {
+      const newBaseRef = await exec(
+        `git merge-base remotes/origin/${mainBranch} HEAD`,
+      )
+
+      baseRef = newBaseRef.stdout.trim()
+    } catch (e: any) {
+      if (e.message.includes('Not a valid object name')) {
+        core.warning(
+          `main branch \`${mainBranch}\` does not exist in the remote. You are most-likely missing ` +
+            `the \`fetch-depth\` option in actions/checkout - Falling back to checking all files.`,
+        )
+        baseRef = ''
+      } else {
+        throw e
+      }
+    }
+  } else {
+    core.info(`found base ref from pull request: ${baseRef}`)
   }
+
+  const changedFiles = baseRef ? await getFilesToCheck(baseRef) : '.'
+
+  core.info(`Files to check:\n${changedFiles}`)
 
   await exec(
     `./node_modules/.bin/prettier --check ${changedFiles.split('\n').join(' ')}`,
   )
 
-  logTrace(`prettier ran`)
+  core.info('Prettier check completed successfully.')
+
+  try {
+    await fs.rm('./node_modules', { recursive: true })
+    logTrace('cleaned up node_modules')
+  } catch (e: any) {
+    core.warning(`Failed to clean up node_modules: ${e.message}`)
+  }
 } catch (e: any) {
   core.setFailed('Prettier check failed.\n' + e.message)
   process.exit(1)
 }
-
-try {
-  await fs.rm('./node_modules', { recursive: true })
-  logTrace('cleaned up node_modules')
-} catch (e: any) {
-  core.warning(`Failed to clean up node_modules: ${e.message}`)
-}
-
-core.info('Prettier check completed successfully.')
