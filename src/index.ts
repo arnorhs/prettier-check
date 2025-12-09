@@ -89,17 +89,15 @@ try {
     `./node_modules/.bin/prettier --check ${changedFiles.split('\n').join(' ')}`,
   )
 
-  logTrace(`prettier ran`)
+  core.info('Prettier check completed successfully.')
+
+  try {
+    await fs.rm('./node_modules', { recursive: true })
+    logTrace('cleaned up node_modules')
+  } catch (e: any) {
+    core.warning(`Failed to clean up node_modules: ${e.message}`)
+  }
 } catch (e: any) {
   core.setFailed('Prettier check failed.\n' + e.message)
   process.exit(1)
 }
-
-try {
-  await fs.rm('./node_modules', { recursive: true })
-  logTrace('cleaned up node_modules')
-} catch (e: any) {
-  core.warning(`Failed to clean up node_modules: ${e.message}`)
-}
-
-core.info('Prettier check completed successfully.')
