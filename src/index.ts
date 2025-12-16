@@ -97,7 +97,7 @@ try {
   core.info(`Files to check:\n${changedFiles}`)
 
   await exec(
-    `./node_modules/.bin/prettier --check ${changedFiles.split('\n').join(' ')}`,
+    `./node_modules/.bin/prettier --ignore-unknown --check ${changedFiles.split('\n').join(' ')}`,
   )
 
   core.info('Prettier check completed successfully.')

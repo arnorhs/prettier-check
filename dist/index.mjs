@@ -66411,7 +66411,7 @@ try {
   const changedFiles = baseRef ? await getFilesToCheck(baseRef) : ".";
   core.info(`Files to check:
 ${changedFiles}`);
-  await exec(`./node_modules/.bin/prettier --check ${changedFiles.split(`
+  await exec(`./node_modules/.bin/prettier --ignore-unknown --check ${changedFiles.split(`
 `).join(" ")}`);
   core.info("Prettier check completed successfully.");
   try {
