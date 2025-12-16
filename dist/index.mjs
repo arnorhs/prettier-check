@@ -66300,7 +66300,7 @@ ${stderr}
 // src/lib/getFilesToCheck.ts
 async function getFilesToCheck(ref) {
   try {
-    const { stdout } = await exec(`git diff --name-only ${ref}`);
+    const { stdout } = await exec(`git diff --diff-filter=d --name-only ${ref}`);
     return stdout.trim();
   } catch (e) {
     return ".";
