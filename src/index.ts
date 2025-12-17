@@ -92,12 +92,12 @@ try {
     core.info(`found base ref from pull request: ${baseRef}`)
   }
 
-  const changedFiles = baseRef ? await getFilesToCheck(baseRef) : '.'
+  const changedFiles = baseRef ? await getFilesToCheck(baseRef) : ['.']
 
-  core.info(`Files to check:\n${changedFiles}`)
+  core.info(`Files to check:\n${changedFiles.join('\n')}`)
 
   await exec(
-    `./node_modules/.bin/prettier --ignore-unknown --check ${changedFiles.split('\n').join(' ')}`,
+    `./node_modules/.bin/prettier --ignore-unknown --check ${changedFiles.join(' ')}`,
   )
 
   core.info('Prettier check completed successfully.')

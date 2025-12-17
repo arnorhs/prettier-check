@@ -66301,9 +66301,14 @@ ${stderr}
 async function getFilesToCheck(ref) {
   try {
     const { stdout } = await exec(`git diff --diff-filter=d --name-only ${ref}`);
-    return stdout.trim();
+    const files = stdout.split(`
+`).map((x) => x.trim()).filter(Boolean);
+    if (files.length === 0) {
+      return ["."];
+    }
+    return files;
   } catch (e) {
-    return ".";
+    return ["."];
   }
 }
 
@@ -66408,11 +66413,11 @@ try {
   } else {
     core.info(`found base ref from pull request: ${baseRef}`);
   }
-  const changedFiles = baseRef ? await getFilesToCheck(baseRef) : ".";
+  const changedFiles = baseRef ? await getFilesToCheck(baseRef) : ["."];
   core.info(`Files to check:
-${changedFiles}`);
-  await exec(`./node_modules/.bin/prettier --ignore-unknown --check ${changedFiles.split(`
-`).join(" ")}`);
+${changedFiles.join(`
+`)}`);
+  await exec(`./node_modules/.bin/prettier --ignore-unknown --check ${changedFiles.join(" ")}`);
   core.info("Prettier check completed successfully.");
   try {
     await fs3.rm("./node_modules", { recursive: true });
